@@ -1,5 +1,6 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
+const compression = require('compression');
 const AppError = require('./utils/AppError');
 const errorHandler = require('./controllers/errorHandler');
 const userRouter = require('./routes/userRouter');
@@ -12,6 +13,7 @@ const app = express();
 //Gloabal Middlewares
 app.use(express.json());
 app.use(cookieParser());
+app.use(compression());
 
 //Entry points
 app.use('/api/v1/users', userRouter);
