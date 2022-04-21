@@ -1,25 +1,41 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
-const compression = require('compression');
 const AppError = require('./utils/AppError');
 const errorHandler = require('./controllers/errorHandler');
 const userRouter = require('./routes/userRouter');
 const productRouter = require('./routes/productRouter');
 const cartRouter = require('./routes/cartRouter');
 const categoryRouter = require('./routes/categoryRouter');
+const orderRouter = require('./routes/orderRouter');
+const orderController = require('./controllers/orderController');
 
 const app = express();
+
+app.use(
+  '/webhook-checkout',
+  express.raw({ type: 'application/json' }),
+  orderController.webhookCheckout
+);
 
 //Gloabal Middlewares
 app.use(express.json());
 app.use(cookieParser());
-app.use(compression());
+app.use(express.static(`${__dirname}/Public`));
 
 //Entry points
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/products', productRouter);
 app.use('/api/v1/carts', cartRouter);
 app.use('/api/v1/categories', categoryRouter);
+app.use('/api/v1/orders', orderRouter);
+app.use(
+  '/api/v1/checkout',
+  (req, res, next) => {
+    req.body.amount = 200;
+    next();
+  },
+  orderRouter
+);
 
 app.all('*', (req, _, next) => {
   next(new AppError(404, `Can't find ${req.originalUrl} on this server!`));

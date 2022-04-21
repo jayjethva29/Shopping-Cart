@@ -12,6 +12,11 @@ const productSchema = new mongoose.Schema({
     type: Number,
     required: [true, 'price is required for a product'],
   },
+  description: {
+    type: String,
+    trim: true,
+    maxlength: 200,
+  },
   shippingCost: {
     type: Number,
     default: 0,

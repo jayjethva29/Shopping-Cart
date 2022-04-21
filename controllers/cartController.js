@@ -13,16 +13,27 @@ exports.createCart = async (req, res, next) => {
   }
 };
 
-exports.getAllCarts = handllerFactory.getAll(Cart);
+exports.getMyCart = async (req, res, next) => {
+  try {
+    const cart = await Cart.findOne({ customer: req.user.id }).populate({
+      path: 'items.product',
+      select: 'title price shippingCost brand coverImage',
+    });
+    if (!cart)
+      return next(
+        new AppError(404, `No cart found for this user: ${req.user.id}!`)
+      );
 
-exports.getCartById = handllerFactory.getOne(Cart, {
-  populate: [
-    {
-      path: 'customer',
-      select: 'name',
-    },
-  ],
-});
+    res.status(200).json({
+      status: 'success',
+      data: {
+        data: cart,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
 
 exports.addToCart = async (req, res, next) => {
   try {
@@ -148,3 +159,5 @@ exports.removeFromCart = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.getAllCarts = handllerFactory.getAll(Cart);
