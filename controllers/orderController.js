@@ -8,9 +8,6 @@ const res = require('express/lib/response');
 
 exports.getCheckoutSession = async (req, res, next) => {
   try {
-    // if (req.isBooked)
-    //   return next(new AppError(403, 'You have already booked thid tour'));
-
     // 1) Get the cart of current user
     const cart = await Cart.findOne({
       customer: '625d6023c9dd4d56df5cb02d', // req.user.id
@@ -53,30 +50,9 @@ exports.createOrder = async () => {
     user: cart.customer,
     items: cart.items,
     amount: cart.subtotal,
+    // address:
+    // paymentIntent:
   });
-
-  //TESTING TO CREATE AN ORDER
-  // try {
-  //   const order = await Order.create({
-  //     user: '625d6023c9dd4d56df5cb02d',
-  //     items: [
-  //       {
-  //         product: '625e713cbb74403ff2b3dd77',
-  //         quantity: 4,
-  //         _id: '625fa6f1dc75f9133a4ba91c',
-  //       },
-  //       {
-  //         product: '625d81d841ad4e2044957689',
-  //         quantity: 2,
-  //         _id: '6260f1daf015636a0f64d426',
-  //       },
-  //     ],
-  //     amount: 1234,
-  //   });
-  //   console.log(order);
-  // } catch (err) {
-  //   res.send(err);
-  // }
 };
 
 //TODO: create process.env.STRIPE_WEBHOOK_KEY
@@ -96,19 +72,4 @@ exports.webhookCheckout = async (req, res, next) => {
   if (event.type === 'stripe.session.completed') createOrder(event.data.object);
 
   res.status(200).json({ received: true });
-};
-
-/////
-exports.getPaymentIntent = async (req, res) => {
-  const paymentIntent = await stripe.paymentIntents.create({
-    amount: req.body.amount * 100,
-    currency: 'inr',
-    automatic_payment_methods: {
-      enabled: true,
-    },
-  });
-
-  res.send({
-    clientSecret: paymentIntent.client_secret,
-  });
 };

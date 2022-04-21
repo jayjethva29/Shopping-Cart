@@ -2,16 +2,10 @@ const mongoose = require('mongoose');
 
 const orderSchema = new mongoose.Schema(
   {
-    //   tour: {
-    //     type: mongoose.Schema.ObjectId,
-    //     ref: 'Tour',
-    //     required: [true, 'Order must belong to a Tour!'],
-    //   },
-
     user: {
       type: mongoose.Schema.ObjectId,
       ref: 'User',
-      required: [true, 'Order must belong to a User!'],
+      required: [true, 'An order must belong to a user!'],
     },
     items: [
       {
@@ -26,7 +20,17 @@ const orderSchema = new mongoose.Schema(
     ],
     amount: {
       type: Number,
-      require: [true, 'Order must have an amount'],
+      require: [true, 'amount is required for an order!'],
+    },
+    address: {
+      type: String,
+      trim: true,
+      maxlength: 100,
+      require: [true, 'address is required for an order!'],
+    },
+    paymentIntent: {
+      type: String,
+      required: [true, 'payment-intent is required for an order!'],
     },
   },
   {
