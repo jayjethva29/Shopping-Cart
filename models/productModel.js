@@ -1,5 +1,7 @@
-const req = require('express/lib/request');
 const mongoose = require('mongoose');
+const { promisify } = require('util');
+const req = require('express/lib/request');
+const { unlink } = require('fs');
 
 const productSchema = new mongoose.Schema({
   title: {
@@ -35,6 +37,15 @@ const productSchema = new mongoose.Schema({
     default: 'default.png',
   },
   images: [String],
+  ratingsAverage: {
+    type: Number,
+    default: 0,
+    set: (val) => val.toFixed(1),
+  },
+  ratingsQuantity: {
+    type: Number,
+    default: 0,
+  },
 });
 
 productSchema.statics.updateAvailibility = async function (
@@ -48,6 +59,22 @@ productSchema.statics.updateAvailibility = async function (
     }
   );
 };
+
+productSchema.pre('findOneAndDelete', async function (next) {
+  const doc = await this.model.findOne(this.getQuery());
+  this.product = doc;
+  next();
+});
+
+productSchema.post('findOneAndDelete', function () {
+  if (!this.product) return;
+
+  const product = this.product;
+  if (product.images.length > 0)
+    product.images.forEach((img) => {
+      promisify(unlink)(`${__dirname}/../Public/imgs/products/${img}`);
+    });
+});
 
 const Product = mongoose.model('Product', productSchema);
 module.exports = Product;

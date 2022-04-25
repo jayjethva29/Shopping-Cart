@@ -57,6 +57,13 @@ exports.getAll = (Model, options) => async (req, res, next) => {
       .sort()
       .limitFields()
       .paginate();
+
+    // if (options?.populate)
+    //   options.populate.forEach(
+    //     (opt) => (query = apiFeatures.query.populate(opt))
+    //   );
+    //if (options?.select) query = query.select(options.select);
+
     const docs = await apiFeatures.query;
 
     res.status(200).json({
@@ -150,8 +157,6 @@ exports.deleteOne = (Model) => async (req, res, next) => {
       status: 'success',
       data: null,
     });
-
-    next();
   } catch (err) {
     next(err);
   }

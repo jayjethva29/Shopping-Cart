@@ -5,7 +5,7 @@ const { createCart } = require('../controllers/cartController');
 
 const router = express.Router();
 
-router.post('/singup', authController.singup, createCart);
+router.post('/singup', authController.singup);
 router.post('/login', authController.login);
 router.post('/logout', authController.protectRoute, authController.logout);
 

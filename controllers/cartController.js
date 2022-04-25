@@ -4,13 +4,19 @@ const Product = require('../models/productModel');
 const AppError = require('../utils/AppError');
 const handllerFactory = require('./handllerFactory');
 
-exports.createCart = async (req, res, next) => {
-  try {
-    await Cart.create({ customer: req.userId });
-  } catch (err) {
-    next(err);
-  }
-};
+// exports.createCart = async (req, res, next) => {
+//   try {
+//     await Cart.create({ customer: req.userId });
+//     res.status(200).json({
+//       status: 'success',
+//       data: {
+//         data: req.newUser,
+//       },
+//     });
+//   } catch (err) {
+//     next(err);
+//   }
+// };
 
 exports.getAllCarts = handllerFactory.getAll(Cart);
 

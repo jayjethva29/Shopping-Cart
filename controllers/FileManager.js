@@ -23,20 +23,18 @@ exports.uploadFile = (mimetypes, fileField) => {
 };
 
 /**
- * @param {String} fileField Type of the file
+ * @param {String} fileField Field of the body containing file
  * @param {String} toFormat Desired format of the file
- * @param {String} fileNamePrefix Prefix for the fileName
  * @param {String} destination Path of the folder to store filrs
+ * - Before using resizeFile, set req.fileName
  */
 exports.resizeFile =
-  (fileField, toFormat, fileNamePrefix, destination) =>
-  async (req, res, next) => {
-    if (!req.file) return next(new AppError(404, 'No file found to upload!'));
+  (fileField, toFormat, destination) => async (req, res, next) => {
+    // if (!req.file) return next(new AppError(404, 'No file found to upload!'));
+    if (!req.file) return next();
 
     //set path on body
-    req.body[fileField] = req.file.filename = `${fileNamePrefix}-${
-      req.fileId
-    }-${Date.now()}.${toFormat}`;
+    req.body[fileField] = req.file.filename = `${req.fileName}.${toFormat}`;
 
     try {
       await sharp(req.file.buffer)
@@ -50,13 +48,14 @@ exports.resizeFile =
     }
   };
 
+/** - Before using deleteFile, set req.filePath  */
 exports.deleteFile = async (req, res, next) => {
   try {
     await promisify(unlink)(req.filePath);
     next();
   } catch (err) {
-    // if (err.code === 'ENOENT')
-    //   return next(new AppError(400, 'File not exists!'));
+    if (err.code === 'ENOENT')
+      return next(new AppError(400, 'File not exists!'));
     next(err);
   }
 };

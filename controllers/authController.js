@@ -21,16 +21,17 @@ exports.singup = async (req, res, next) => {
 
     //TODO: Send welcome email
 
+    //Create a cart
+    await Cart.create({ customer: newUser.id });
+
     req.userId = newUser.id;
     newUser.__v = newUser.password = newUser.confirmPassword = undefined;
-
     res.status(200).json({
       status: 'success',
       data: {
         data: newUser,
       },
     });
-    next();
   } catch (err) {
     next(err);
   }
@@ -87,7 +88,15 @@ exports.protectRoute = async (req, res, next) => {
 exports.isAdmin = (req, res, next) => {
   if (!req.user.isAdmin)
     return next(
-      new AppError(403, "You don't have permission to perform this task")
+      new AppError(403, "You don't have permission to perform this task!")
+    );
+  next();
+};
+
+exports.isUser = (req, res, next) => {
+  if (req.user.isAdmin)
+    return next(
+      new AppError(403, "You don't have permission to perform this task!")
     );
   next();
 };
